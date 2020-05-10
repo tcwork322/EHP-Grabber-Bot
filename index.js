@@ -65,7 +65,7 @@ client.on('message', async message => {
 						.setColor('#0099ff')
 						.setTitle(username)
 						.setURL('https://www.crystalmathlabs.com/tracker/track.php?player=' + url)
-						.setAuthor(client.user.username, client.user.avatarURL())
+						.setAuthor(client.user.username, client.user.avatarURL(), 'https://github.com/tcwork322/EHP-Grabber-Bot')
 						.setDescription('EHP information for user.')
 						.setThumbnail(client.user.avatarURL())
 						.addFields(
