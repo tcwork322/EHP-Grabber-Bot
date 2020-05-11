@@ -42,7 +42,7 @@ client.on('message', async message => {
 				monthlyStats = stats.ehp.ehpGained;
 			}
 			else if (err) {
-				return message.channel.send('Error getting monthly stats, please try again.')
+				return message.reply('username cannot be found')
 			}
 		})();
 		// Weekly
@@ -51,9 +51,6 @@ client.on('message', async message => {
 			const { err, stats } = await cml.track(username, week);
 			if (!err) {
 				weekStats = stats.ehp.ehpGained;
-			}
-			else if (err) {
-				return message.channel.send('Error getting weekly stats, please try again.')
 			}
 		})();
 		// Full Time Stats
