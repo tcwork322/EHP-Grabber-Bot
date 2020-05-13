@@ -151,22 +151,30 @@ client.on('message', async message => {
 	// Login and out commands for mySQL
 	if (command === 'login') {
 		const username = args.join(' ');
-		con.query(`SELECT * FROM login where id = '${message.author.id}'`, (err, rows) => {
-			if(err) throw err;
+		const verifyStats = await hiscores.getStats(username).catch(err => message.reply(err + '.'));
+		const verifyUsername = Object.prototype.hasOwnProperty.call(verifyStats, 'main');
+		if(verifyUsername === true) {
+			con.query(`SELECT * FROM login where id = '${message.author.id}'`, (err, rows) => {
+				if(err) throw err;
 
-			let sql;
+				let sql;
 
-			if(rows.length < 1) {
-				sql = `INSERT INTO login(id, osrsname) VALUES ('${message.author.id}', '${username}')`;
-				message.reply('Success! Logged in as ' + username + '!');
-			}
-			else {
-				message.reply('You are already logged in. If you want to logout, type' + prefix + 'logout.');
-				return;
-			}
-			con.query(sql, console.log);
-		});
+				if(rows.length < 1) {
+					sql = `INSERT INTO login(id, osrsname) VALUES ('${message.author.id}', '${username}')`;
+					message.reply('Success! Logged in as ' + username + '!');
+				}
+				else {
+					message.reply('You are already logged in. If you want to logout, type' + prefix + 'logout.');
+					return;
+				}
+				con.query(sql, console.log);
+			});
+		}
+		else {
+			return;
+		}
 	}
+
 	if (command === 'logout') {
 		con.query(`SELECT * FROM login where id = '${message.author.id}'`, (err, rows) => {
 			if(err) throw err;
@@ -186,6 +194,6 @@ client.on('message', async message => {
 	}
 });
 
-
+// Notes for future, when weekly challenge starts, get osrs hiscores for selected boss and add to db, every 4 hrs subtract database kc from new kc to get current score
 // Here you can login the bot. It automatically attempts to login the bot with the environment variable you set for your bot token (either "CLIENT_TOKEN" or "DISCORD_TOKEN")
 client.login(process.env.DISCORD_TOKEN);
