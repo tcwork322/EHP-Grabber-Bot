@@ -88,54 +88,47 @@ client.on('message', async message => {
 		console.log(clueStat.main.clues);
 		const clueEmbed = {
 			color: 0x0099ff,
-			title: 'Clue data',
-			author: {
-				name: username,
-				icon_url: client.user.avatarURL(),
-			},
-			description: 'Clue data for ' + username,
+			title: username,
+			description: 'Data for ' + username + '\'' + 's clues.',
 			thumbnail: {
-				url: client.user.avatarURL(),
+				url: 'https://oldschool.runescape.wiki/images/thumb/f/fc/Clue_scroll_%28master%29_detail.png/150px-Clue_scroll_%28master%29_detail.png?596fb',
 			},
 			fields: [
 				{
-					name: 'All',
-					value: 'Rank : ' + clueStat.main.clues.all.rank + '\n' + 'Score : ' + clueStat.main.clues.all.score,
+					name: '__**All**__',
+					value: 'Score: ' + clueStat.main.clues.all.score + '\n' + 'Rank: ' + clueStat.main.clues.all.rank,
 				},
 				{
-					name: 'Beginner',
-					value: 'Rank : ' + clueStat.main.clues.beginner.rank + '\n' + 'Score : ' + clueStat.main.clues.beginner.score,
+					name: '__**Beginner**__',
+					value: 'Score: ' + clueStat.main.clues.beginner.score + '\n' + 'Rank: ' + clueStat.main.clues.beginner.rank,
 					inline: true,
 				},
 				{
-					name: 'Easy',
-					value: 'Rank : ' + clueStat.main.clues.easy.rank + '\n' + 'Score : ' + clueStat.main.clues.easy.score,
+					name: '__**Easy**__',
+					value: 'Score: ' + clueStat.main.clues.easy.score + '\n' + 'Rank: ' + clueStat.main.clues.easy.rank,
 					inline: true,
 				},
 				{
-					name: 'Medium',
-					value: 'Rank : ' + clueStat.main.clues.medium.rank + '\n' + 'Score : ' + clueStat.main.clues.medium.score,
+					name: '__**Medium**__',
+					value: 'Score: ' + clueStat.main.clues.medium.score + '\n' + 'Rank: ' + clueStat.main.clues.medium.rank,
 					inline: true,
 				},
 				{
-					name: 'Hard',
-					value: 'Rank : ' + clueStat.main.clues.hard.rank + '\n' + 'Score : ' + clueStat.main.clues.hard.score,
+					name: '__**Hard**__',
+					value: 'Score: ' + clueStat.main.clues.hard.score + '\n' + 'Rank: ' + clueStat.main.clues.hard.rank,
 					inline: true,
 				},
 				{
-					name: 'Elite',
-					value: 'Rank : ' + clueStat.main.clues.elite.rank + '\n' + 'Score : ' + clueStat.main.clues.elite.score,
+					name: '__**Elite**__',
+					value: 'Score: ' + clueStat.main.clues.elite.score + '\n' + 'Rank: ' + clueStat.main.clues.elite.rank,
 					inline: true,
 				},
 				{
-					name: 'Master',
-					value: 'Rank : ' + clueStat.main.clues.master.rank + '\n' + 'Score : ' + clueStat.main.clues.master.score,
+					name: '__**Master**__',
+					value: 'Score: ' + clueStat.main.clues.master.score + '\n' + 'Rank: ' + clueStat.main.clues.master.rank,
 					inline: true,
 				},
 			],
-			image: {
-				url: client.user.avatarURL(),
-			},
 			timestamp: new Date(),
 			footer: {
 				text: 'Wise Old Bot ',
