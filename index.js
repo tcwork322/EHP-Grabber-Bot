@@ -7,7 +7,6 @@ require('dotenv').config();
 
 const client = new Discord.Client();
 const cml = new Crystalmethlabs();
-const osrs = new Crystalmethlabs('osrs');
 const prefix = '$!';
 
 const con = mysql.createConnection({
@@ -39,7 +38,7 @@ client.on('message', async message => {
 	// EHP Command
 	if (command === 'ehp') {
 		if (args.length < 1) {
-			return message.reply('Please specify a username.')
+			return message.reply('Please specify a username.');
 		}
 		// Concat
 		const username = args.join(' ');
@@ -55,7 +54,7 @@ client.on('message', async message => {
 				monthlyStats = stats.ehp.ehpGained;
 			}
 			else if (err) {
-				return message.reply('username cannot be found')
+				return message.reply('username cannot be found');
 			}
 		})();
 		// Weekly
@@ -89,7 +88,7 @@ client.on('message', async message => {
 						.setFooter(client.user.username, client.user.avatarURL());
 
 					message.channel.send(ehpEmbed);
-				}, 1000)
+				}, 1000);
 			}
 		})();
 	}
