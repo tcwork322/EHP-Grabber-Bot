@@ -1,6 +1,7 @@
 const Discord = require('discord.js');
 const Crystalmethlabs = require('crystalmethlabs');
 const hiscores = require('osrs-json-hiscores');
+const mysql = require('mysql');
 // Importing this allows you to access the environment variables of the running node process
 require('dotenv').config();
 
@@ -9,10 +10,21 @@ const cml = new Crystalmethlabs();
 const osrs = new Crystalmethlabs('osrs');
 const prefix = '$!';
 
+const con = mysql.createConnection({
+	host : 'localhost',
+	user: 'root',
+	password: 'testing',
+	database: 'sadb',
+});
+
 
 client.on('ready', () => {
 	console.log(`Logged in as ${client.user.tag}!`);
 	client.user.setActivity(`${prefix}`, { type: 'LISTENING' });
+	con.connect(err => {
+		if(err) throw err;
+		console.log('Connected to Database');
+	});
 });
 
 client.on('message', async message => {
@@ -81,7 +93,7 @@ client.on('message', async message => {
 			}
 		})();
 	}
-	// Clue Command Testing
+	// Clue Command
 	if (command === 'clues') {
 		const username = args.join(' ');
 		const clueStat = await hiscores.getStats(username);
@@ -136,6 +148,42 @@ client.on('message', async message => {
 			},
 		};
 		message.channel.send({ embed: clueEmbed });
+	}
+	// Login and out commands for mySQL
+	if (command === 'login') {
+		const username = args.join(' ');
+		con.query(`SELECT * FROM login where id = '${message.author.id}'`, (err, rows) => {
+			if(err) throw err;
+
+			let sql;
+
+			if(rows.length < 1) {
+				sql = `INSERT INTO login(id, osrsname) VALUES ('${message.author.id}', '${username}')`;
+				message.reply('Success! Logged in as ' + username + '!');
+			}
+			else {
+				message.reply('You are already logged in. If you want to logout, type' + prefix + 'logout.');
+				return;
+			}
+			con.query(sql, console.log);
+		});
+	}
+	if (command === 'logout') {
+		con.query(`SELECT * FROM login where id = '${message.author.id}'`, (err, rows) => {
+			if(err) throw err;
+
+			let sql;
+
+			if(rows.length < 1) {
+				message.reply('You are not logged in.');
+				return;
+			}
+			else {
+				sql = `DELETE FROM login WHERE id='${message.author.id}'`;
+				message.reply('You have logged out.');
+			}
+			con.query(sql, console.log);
+		});
 	}
 });
 
