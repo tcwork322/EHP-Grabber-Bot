@@ -50,6 +50,8 @@ client.on('message', async message => {
 			const { err } = await cml.update(username);
 			if (err) {
 				console.log(err);
+				message.reply('error updating CML. ' + 'Error code - ' + err.statusCode + ' : ' + err.statusMessage);
+				return;
 			}
 		})();
 		// Monthly
@@ -60,7 +62,8 @@ client.on('message', async message => {
 				monthlyStats = stats.ehp.ehpGained;
 			}
 			else if (err) {
-				message.reply('username cannot be found');
+				message.reply('error getting username.' + ' ' + 'Error code - ' + err.statusCode + ' : ' + err.statusMessage);
+				console.log(err);
 				return;
 			}
 		})();
