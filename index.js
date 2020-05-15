@@ -19,7 +19,7 @@ const con = mysql.createConnection({
 
 client.on('ready', () => {
 	console.log(`Logged in as ${client.user.tag}!`);
-	client.user.setActivity(`${prefix}`, { type: 'LISTENING' });
+	client.user.setActivity('me being coded.', { type: 'WATCHING' });
 	con.connect(err => {
 		if(err) throw err;
 		console.log('Connected to Database');
@@ -27,7 +27,6 @@ client.on('ready', () => {
 });
 
 client.on('message', async message => {
-
 	// Here's I'm using one of An Idiot's Guide's basic command handlers. Using the PREFIX environment variable above, I can do the same as the bot token below
 	if (message.author.bot) return;
 	if (!message.content.startsWith(prefix)) return;
@@ -46,7 +45,14 @@ client.on('message', async message => {
 		// Time Frames
 		let weekStats;
 		let monthlyStats;
-		// Async Function to define Month, Week and Day Respectively (Monthly)
+		// Async Function to define Month and Week EHP stats/update CML
+		(async () => {
+			const { err } = await cml.update(username);
+			if (err) {
+				console.log(err);
+			}
+		})();
+		// Monthly
 		(async () => {
 			const month = 24 * 30 * 3600;
 			const { err, stats } = await cml.track(username, month);
@@ -54,7 +60,8 @@ client.on('message', async message => {
 				monthlyStats = stats.ehp.ehpGained;
 			}
 			else if (err) {
-				return message.reply('username cannot be found');
+				message.reply('username cannot be found');
+				return;
 			}
 		})();
 		// Weekly
@@ -154,17 +161,17 @@ client.on('message', async message => {
 		const verifyStats = await hiscores.getStats(username).catch(err => message.reply(err + '.'));
 		const verifyUsername = Object.prototype.hasOwnProperty.call(verifyStats, 'main');
 		if(verifyUsername === true) {
-			con.query(`SELECT * FROM login where id = '${message.author.id}'`, (err, rows) => {
+			con.query(`SELECT * FROM global where id = '${message.author.id}' AND server = '${message.guild.id}'`, (err, rows) => {
 				if(err) throw err;
 
 				let sql;
 
 				if(rows.length < 1) {
-					sql = `INSERT INTO login(id, osrsname) VALUES ('${message.author.id}', '${username}')`;
+					sql = `INSERT INTO global (name, id, osrsname, server) VALUES ('${message.author.username}', '${message.author.id}', '${username}', '${message.guild.id}')`;
 					message.reply('Success! Logged in as ' + username + '!');
 				}
 				else {
-					message.reply('You are already logged in. If you want to logout, type' + prefix + 'logout.');
+					message.reply('You are already logged in. If you want to logout, type ' + prefix + 'logout.');
 					return;
 				}
 				con.query(sql, console.log);
@@ -176,7 +183,7 @@ client.on('message', async message => {
 	}
 
 	if (command === 'logout') {
-		con.query(`SELECT * FROM login where id = '${message.author.id}'`, (err, rows) => {
+		con.query(`SELECT * FROM global where id = '${message.author.id}' AND server = '${message.guild.id}'`, (err, rows) => {
 			if(err) throw err;
 
 			let sql;
@@ -186,14 +193,24 @@ client.on('message', async message => {
 				return;
 			}
 			else {
-				sql = `DELETE FROM login WHERE id='${message.author.id}'`;
+				sql = `DELETE FROM global WHERE id='${message.author.id}' AND server = '${message.guild.id}`;
 				message.reply('You have logged out.');
 			}
 			con.query(sql, console.log);
 		});
 	}
+
+	if (command === 'debug') {
+		const guildIds = client.guilds.cache.filter(g => g.id == message.guild.id).map(g => g.members);
+		// console.log(guildNames);
+		// console.log(usernames);
+		// console.log(client.users.cache);
+		console.log(guildIds);
+	}
 });
 
 // Notes for future, when weekly challenge starts, get osrs hiscores for selected boss and add to db, every 4 hrs subtract database kc from new kc to get current score
+// Add column for username also.
+// Add extra two columns to tables determining start and end kc for bosses to work out scoreboard.
 // Here you can login the bot. It automatically attempts to login the bot with the environment variable you set for your bot token (either "CLIENT_TOKEN" or "DISCORD_TOKEN")
 client.login(process.env.DISCORD_TOKEN);
