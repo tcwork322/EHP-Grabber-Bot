@@ -1,39 +1,94 @@
 const Discord = require('discord.js');
-const Crystalmethlabs = require('crystalmethlabs');
 const hiscores = require('osrs-json-hiscores');
-const mysql = require('mysql');
+// const mysql = require('mysql');
 // Importing this allows you to access the environment variables of the running node process
 require('dotenv').config();
 
 const client = new Discord.Client();
-const cml = new Crystalmethlabs();
+const puppeteer = require('puppeteer');
 const prefix = '$!';
+let weeklyEhp;
+let monthlyEhp;
+let yearlyEhp;
+let allEhp;
 
-const con = mysql.createConnection({
+// Scrape Functions
+async function scrapeLabsAlltime(labsUrl) {
+	const browser = await puppeteer.launch();
+	const page = await browser.newPage();
+	await page.goto(labsUrl);
+
+	const [el] = await page.$x('//*[@id="stats_table"]/tbody/tr[26]/td[2]');
+	const txt = await el.getProperty('textContent');
+	const rawTxt = await txt.jsonValue();
+	console.log(rawTxt);
+	allEhp = await rawTxt;
+	browser.close();
+}
+
+async function scrapeLabsYearly(labsUrl) {
+	const browser = await puppeteer.launch();
+	const page = await browser.newPage();
+	await page.goto(labsUrl);
+
+	const [el] = await page.$x('//*[@id="stats_table"]/tbody/tr[26]/td[2]');
+	const txt = await el.getProperty('textContent');
+	const rawTxt = await txt.jsonValue();
+	console.log(rawTxt);
+	yearlyEhp = await rawTxt;
+	browser.close();
+}
+
+async function scrapeLabsMonthly(labsUrl) {
+	const browser = await puppeteer.launch();
+	const page = await browser.newPage();
+	await page.goto(labsUrl);
+
+	const [el] = await page.$x('//*[@id="stats_table"]/tbody/tr[26]/td[2]');
+	const txt = await el.getProperty('textContent');
+	const rawTxt = await txt.jsonValue();
+	console.log(rawTxt);
+	monthlyEhp = await rawTxt;
+	browser.close();
+}
+async function scrapeLabsWeekly(labsUrl) {
+	const browser = await puppeteer.launch();
+	const page = await browser.newPage();
+	await page.goto(labsUrl);
+
+	const [el] = await page.$x('//*[@id="stats_table"]/tbody/tr[26]/td[2]');
+	const txt = await el.getProperty('textContent');
+	const rawTxt = await txt.jsonValue();
+	console.log(rawTxt);
+	weeklyEhp = await rawTxt;
+	browser.close();
+}
+
+/* const con = mysql.createConnection({
 	host : 'localhost',
 	user: 'root',
 	password: 'testing',
 	database: 'sadb',
-});
+}); */
 
 
 client.on('ready', () => {
 	console.log(`Logged in as ${client.user.tag}!`);
-	client.user.setActivity('me being coded.', { type: 'WATCHING' });
-	con.connect(err => {
+	client.user.setActivity(prefix, { type: 'LISTENING' });
+	/* con.connect(err => {
 		if(err) throw err;
 		console.log('Connected to Database');
-	});
+	}); */
 });
 
 client.on('message', async message => {
-	// Here's I'm using one of An Idiot's Guide's basic command handlers. Using the PREFIX environment variable above, I can do the same as the bot token below
 	if (message.author.bot) return;
 	if (!message.content.startsWith(prefix)) return;
 	if (!message.guild) return;
 
 	const args = message.content.slice(prefix.length).trim().split(/ +/g);
 	const command = args.shift().toLowerCase();
+	// Nicknamer Role
 	// EHP Command
 	if (command === 'ehp') {
 		if (args.length < 1) {
@@ -42,63 +97,36 @@ client.on('message', async message => {
 		// Concat
 		const username = args.join(' ');
 		const url = args.join('+');
-		// Time Frames
-		let weekStats;
-		let monthlyStats;
-		// Async Function to define Month and Week EHP stats/update CML
+		// EHP Grabber
 		(async () => {
-			const { err } = await cml.update(username);
-			if (err) {
-				console.log(err);
-				message.reply('error updating CML. ' + 'Error code - ' + err.statusCode + ' : ' + err.statusMessage);
-				return;
-			}
-		})();
-		// Monthly
-		(async () => {
-			const month = 24 * 30 * 3600;
-			const { err, stats } = await cml.track(username, month);
-			if (!err) {
-				monthlyStats = stats.ehp.ehpGained;
-			}
-			else if (err) {
-				message.reply('error getting username.' + ' ' + 'Error code - ' + err.statusCode + ' : ' + err.statusMessage);
-				console.log(err);
-				return;
-			}
-		})();
-		// Weekly
-		(async () => {
-			const week = 24 * 7 * 3600;
-			const { err, stats } = await cml.track(username, week);
-			if (!err) {
-				weekStats = stats.ehp.ehpGained;
-			}
-		})();
-		// Full Time Stats
-		(async () => {
-			const { err, stats } = await cml.track(username);
-			if (!err) {
-				setTimeout(function() {
-					const ehpEmbed = new Discord.MessageEmbed()
-						.setColor('#0099ff')
-						.setTitle(username)
-						.setURL('https://www.crystalmathlabs.com/tracker/track.php?player=' + url)
-						.setAuthor(client.user.username, client.user.avatarURL(), 'https://github.com/tcwork322/EHP-Grabber-Bot')
-						.setDescription('EHP information for user.')
-						.setThumbnail(client.user.avatarURL())
-						.addFields(
-							{ name: 'Total Hours Tracked :', value: stats.ehp.hours },
-							{ name: '\u200B', value: '\u200B' },
-							{ name: 'Total EHP :', value: stats.ehp.ehpGained, inline: true },
-							{ name: 'Monthly EHP :', value: monthlyStats, inline: true },
-							{ name: 'Weekly EHP :', value: weekStats, inline: true },
-						)
-						.setTimestamp()
-						.setFooter(client.user.username, client.user.avatarURL());
+			try {
+				await scrapeLabsAlltime('https://www.crystalmathlabs.com/tracker/track.php?player=' + url + '&time=all').catch(console.log('Caught Error'));
+				await scrapeLabsYearly('https://www.crystalmathlabs.com/tracker/track.php?player=' + url + '&time=365d');
+				await scrapeLabsMonthly('https://www.crystalmathlabs.com/tracker/track.php?player=' + url + '&time=31d');
+				await scrapeLabsWeekly('https://www.crystalmathlabs.com/tracker/track.php?player=' + url);
+				// Full Time Stats
+				const ehpEmbed = new Discord.MessageEmbed()
+					.setColor('#0099ff')
+					.setTitle(username)
+					.setURL('https://www.crystalmathlabs.com/tracker/track.php?player=' + url)
+					.setAuthor(client.user.username, client.user.avatarURL(), 'https://github.com/tcwork322/EHP-Grabber-Bot')
+					.setDescription('EHP information for user.')
+					.setThumbnail(client.user.avatarURL())
+					.addFields(
+						{ name: 'Total Hours Tracked :', value: 'Shrug' },
+						{ name: '\u200B', value: '\u200B' },
+						{ name: 'Total EHP :', value: allEhp, inline: true },
+						{ name: 'Yearly EHP :', value: yearlyEhp, inline: true },
+						{ name: 'Monthly EHP :', value: monthlyEhp, inline: true },
+						{ name: 'Weekly EHP :', value: weeklyEhp, inline: true },
+					)
+					.setTimestamp()
+					.setFooter(client.user.username, client.user.avatarURL());
 
-					message.channel.send(ehpEmbed);
-				}, 1000);
+				message.channel.send(ehpEmbed);
+			}
+			catch {
+				message.reply('error occured, most likely the scraper was blocked by CML, try again.');
 			}
 		})();
 	}
@@ -159,7 +187,7 @@ client.on('message', async message => {
 		message.channel.send({ embed: clueEmbed });
 	}
 	// Login and out commands for mySQL
-	if (command === 'login') {
+	/* if (command === 'login') {
 		const username = args.join(' ');
 		const verifyStats = await hiscores.getStats(username).catch(err => message.reply(err + '.'));
 		const verifyUsername = Object.prototype.hasOwnProperty.call(verifyStats, 'main');
@@ -209,7 +237,7 @@ client.on('message', async message => {
 		// console.log(usernames);
 		// console.log(client.users.cache);
 		console.log(guildIds);
-	}
+	}*/
 });
 
 // Notes for future, when weekly challenge starts, get osrs hiscores for selected boss and add to db, every 4 hrs subtract database kc from new kc to get current score
