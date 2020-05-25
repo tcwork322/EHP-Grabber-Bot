@@ -13,6 +13,15 @@ let yearlyEhp;
 let allEhp;
 
 // Scrape Functions
+async function updateLabs(updateUrl) {
+	const browser = await puppeteer.launch();
+	const page = await browser.newPage();
+	page.goto(updateUrl).catch(e => console.log('Expected navigation error, no worries.'));
+	setTimeout(function() {
+		browser.close();
+	}, 10000);
+}
+
 async function scrapeLabsAlltime(labsUrl) {
 	const browser = await puppeteer.launch();
 	const page = await browser.newPage();
@@ -92,6 +101,7 @@ client.on('message', async message => {
 	// EHP Command
 	if (command === 'ehp') {
 		if (args.length < 1) {
+			message.delete();
 			return message.reply('Please specify a username.');
 		}
 		// Concat
@@ -100,25 +110,28 @@ client.on('message', async message => {
 		// EHP Grabber
 		(async () => {
 			try {
-				await scrapeLabsAlltime('https://www.crystalmathlabs.com/tracker/track.php?player=' + url + '&time=all').catch(console.log('Caught Error'));
+				message.delete();
+				const msg = await message.channel.send('Updating CML... ⏱');
+				await updateLabs('https://www.crystalmathlabs.com/tracker/update.php?player=' + url);
+				await scrapeLabsAlltime('https://www.crystalmathlabs.com/tracker/track.php?player=' + url + '&time=all');
+				msg.edit('Updated CML, grabbing EHP... 💎');
 				await scrapeLabsYearly('https://www.crystalmathlabs.com/tracker/track.php?player=' + url + '&time=365d');
 				await scrapeLabsMonthly('https://www.crystalmathlabs.com/tracker/track.php?player=' + url + '&time=31d');
 				await scrapeLabsWeekly('https://www.crystalmathlabs.com/tracker/track.php?player=' + url);
+				msg.delete();
 				// Full Time Stats
 				const ehpEmbed = new Discord.MessageEmbed()
 					.setColor('#0099ff')
 					.setTitle(username)
 					.setURL('https://www.crystalmathlabs.com/tracker/track.php?player=' + url)
 					.setAuthor(client.user.username, client.user.avatarURL(), 'https://github.com/tcwork322/EHP-Grabber-Bot')
-					.setDescription('EHP information for user.')
+					.setDescription('EHP info 📈')
 					.setThumbnail(client.user.avatarURL())
 					.addFields(
-						{ name: 'Total Hours Tracked :', value: 'Shrug' },
-						{ name: '\u200B', value: '\u200B' },
-						{ name: 'Total EHP :', value: allEhp, inline: true },
-						{ name: 'Yearly EHP :', value: yearlyEhp, inline: true },
-						{ name: 'Monthly EHP :', value: monthlyEhp, inline: true },
-						{ name: 'Weekly EHP :', value: weeklyEhp, inline: true },
+						{ name: '**Total EHP** : ', value: allEhp, inline: true },
+						{ name: '**Yearly EHP** : ', value: yearlyEhp, inline: true },
+						{ name: '**Monthly EHP** : ', value: monthlyEhp, inline: true },
+						{ name: '**Weekly EHP** : ', value: weeklyEhp, inline: true },
 					)
 					.setTimestamp()
 					.setFooter(client.user.username, client.user.avatarURL());
@@ -126,7 +139,7 @@ client.on('message', async message => {
 				message.channel.send(ehpEmbed);
 			}
 			catch {
-				message.reply('error occured, most likely the scraper was blocked by CML, try again.');
+				message.reply('error occured, make sure you have entered the right username! 📋');
 			}
 		})();
 	}
