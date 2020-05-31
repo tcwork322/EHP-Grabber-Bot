@@ -1,5 +1,7 @@
 const Discord = require('discord.js');
 const hiscores = require('osrs-json-hiscores');
+const Canvas = require('canvas');
+Canvas.registerFont('Runescape-Chat-07.ttf', { family: 'RunescapeUF', weight: '200' });
 // const mysql = require('mysql');
 // Importing this allows you to access the environment variables of the running node process
 require('dotenv').config();
@@ -14,28 +16,6 @@ let yearlyEhp;
 let allEhp;
 
 // Scrape Functions
-
-/* async function getQuote(quoteUrl) {
-	const browser = await puppeteer.launch({
-		headless: true,
-		args: ['--no-sandbox', '--disablesetuid-sandobx'],
-	});
-	const page = await browser.newPage();
-	await page.goto(quoteUrl).catch(e => console.log(e));
-	// Get Quote
-	const [el] = await page.$x('/html/body/div[8]/div/div/div/div/div/div/table[2]/tbody/tr[1]/td[2]/b');
-	const txt = await el.getProperty('textContent');
-	const rawTxt = await txt.jsonValue();
-	console.log(rawTxt);
-	quote = await rawTxt;
-	// Get Author
-	const [el2] = await page.$x('/html/body/div[8]/div/div/div/div/div/div/table[2]/tbody/tr[1]/td[2]/p/a');
-	const txt2 = await el2.getProperty('textContent');
-	const rawTxt2 = await txt2.jsonValue();
-	console.log(rawTxt2);
-	author = await rawTxt2;
-	browser.close();
-} */
 
 async function updateLabs(updateUrl) {
 	const browser = await puppeteer.launch({
@@ -110,27 +90,80 @@ async function scrapeLabsWeekly(labsUrl) {
 	browser.close();
 }
 
-/* const con = mysql.createConnection({
-	host : 'localhost',
-	user: 'root',
-	password: 'testing',
-	database: 'sadb',
-}); */
-
-
 client.on('ready', () => {
 	console.log(`Logged in as ${client.user.tag}!`);
 	client.user.setActivity(prefix, { type: 'LISTENING' });
-	/* con.connect(err => {
-		if(err) throw err;
-		console.log('Connected to Database');
-	}); */
 });
 
 client.on('message', async message => {
 	if (message.author.bot) return;
 	if (!message.content.startsWith(prefix)) return;
 	if (!message.guild) return;
+	// Get Emotes
+	const overall = client.emojis.cache.find(emoji => emoji.name === 'overall');
+	const attack = client.emojis.cache.find(emoji => emoji.name === 'attack');
+	const defence = client.emojis.cache.find(emoji => emoji.name === 'defence');
+	const strength = client.emojis.cache.find(emoji => emoji.name === 'strength');
+	const hitpoints = client.emojis.cache.find(emoji => emoji.name === 'hitpoints');
+	const ranged = client.emojis.cache.find(emoji => emoji.name === 'ranged');
+	const prayer = client.emojis.cache.find(emoji => emoji.name === 'prayer');
+	const magic = client.emojis.cache.find(emoji => emoji.name === 'magic');
+	const cooking = client.emojis.cache.find(emoji => emoji.name === 'cooking');
+	const woodcutting = client.emojis.cache.find(emoji => emoji.name === 'woodcutting');
+	const fletching = client.emojis.cache.find(emoji => emoji.name === 'fletching');
+	const fishing = client.emojis.cache.find(emoji => emoji.name === 'fishing');
+	const firemaking = client.emojis.cache.find(emoji => emoji.name === 'crafting');
+	const crafting = client.emojis.cache.find(emoji => emoji.name === 'crafting');
+	const smithing = client.emojis.cache.find(emoji => emoji.name === 'smithing');
+	const mining = client.emojis.cache.find(emoji => emoji.name === 'mining');
+	const herblore = client.emojis.cache.find(emoji => emoji.name === 'herblore');
+	const agility = client.emojis.cache.find(emoji => emoji.name === 'agility');
+	const thieving = client.emojis.cache.find(emoji => emoji.name === 'thieving');
+	const slayer = client.emojis.cache.find(emoji => emoji.name === 'slayer');
+	const farming = client.emojis.cache.find(emoji => emoji.name === 'farming');
+	const runecrafting = client.emojis.cache.find(emoji => emoji.name === 'runecrafting');
+	const hunter = client.emojis.cache.find(emoji => emoji.name === 'hunter');
+	const construction = client.emojis.cache.find(emoji => emoji.name === 'construction');
+	const dawn = client.emojis.cache.find(emoji => emoji.name === 'Dawn');
+	const kraken = client.emojis.cache.find(emoji => emoji.name === 'Kraken');
+	const thermo = client.emojis.cache.find(emoji => emoji.name === 'Thermonuclear');
+	const cerb = client.emojis.cache.find(emoji => emoji.name === 'Cerb');
+	const sire = client.emojis.cache.find(emoji => emoji.name === 'Sire');
+	const hydra = client.emojis.cache.find(emoji => emoji.name === 'Hydra');
+	const fanatic = client.emojis.cache.find(emoji => emoji.name === 'fanatic');
+	const archaeologist = client.emojis.cache.find(emoji => emoji.name === 'archaeologist');
+	const scorpia = client.emojis.cache.find(emoji => emoji.name === 'scorpia');
+	const kbd = client.emojis.cache.find(emoji => emoji.name === 'kbd');
+	const elemental = client.emojis.cache.find(emoji => emoji.name === 'elemental');
+	const vetion = client.emojis.cache.find(emoji => emoji.name === 'vetion');
+	const venenatis = client.emojis.cache.find(emoji => emoji.name === 'spooder');
+	const callisto = client.emojis.cache.find(emoji => emoji.name === 'callisto');
+	const obor = client.emojis.cache.find(emoji => emoji.name === 'obor');
+	const bryo = client.emojis.cache.find(emoji => emoji.name === 'byro');
+	const mimic = client.emojis.cache.find(emoji => emoji.name === 'mimic');
+	const hespori = client.emojis.cache.find(emoji => emoji.name === 'hespori');
+	const skotizo = client.emojis.cache.find(emoji => emoji.name === 'skotizo');
+	const zalcano = client.emojis.cache.find(emoji => emoji.name === 'zalcano');
+	const olm = client.emojis.cache.find(emoji => emoji.name === 'olm');
+	const tob = client.emojis.cache.find(emoji => emoji.name === 'tob');
+	const barb = client.emojis.cache.find(emoji => emoji.name === 'penance');
+	const gauntlet = client.emojis.cache.find(emoji => emoji.name === 'gauntlet');
+	const jad = client.emojis.cache.find(emoji => emoji.name === 'jad');
+	const zuk = client.emojis.cache.find(emoji => emoji.name === 'zuk');
+	const mole = client.emojis.cache.find(emoji => emoji.name === 'mole');
+	const supreme = client.emojis.cache.find(emoji => emoji.name === 'supreme');
+	const rex = client.emojis.cache.find(emoji => emoji.name === 'rex');
+	const prime = client.emojis.cache.find(emoji => emoji.name === 'prime');
+	const sarachnis = client.emojis.cache.find(emoji => emoji.name === 'sarachnis');
+	const kalphite = client.emojis.cache.find(emoji => emoji.name === 'kq');
+	const kree = client.emojis.cache.find(emoji => emoji.name === 'armadyl');
+	const sara = client.emojis.cache.find(emoji => emoji.name === 'saradomin');
+	const bandos = client.emojis.cache.find(emoji => emoji.name === 'bandos');
+	const kril = client.emojis.cache.find(emoji => emoji.name === 'zamorak');
+	const zulrah = client.emojis.cache.find(emoji => emoji.name === 'zulrah');
+	const vorkath = client.emojis.cache.find(emoji => emoji.name === 'vorkath');
+	const corp = client.emojis.cache.find(emoji => emoji.name === 'corp');
+	const nightmare = client.emojis.cache.find(emoji => emoji.name === 'nightmare');
 
 	const args = message.content.slice(prefix.length).trim().split(/ +/g);
 	const command = args.shift().toLowerCase();
@@ -158,7 +191,7 @@ client.on('message', async message => {
 				msg.delete();
 				// Full Time Stats
 				const ehpEmbed = new Discord.MessageEmbed()
-					.setColor('#0099ff')
+					.setColor('#0609A2')
 					.setTitle(username)
 					.setURL('https://www.crystalmathlabs.com/tracker/track.php?player=' + url)
 					.setAuthor(client.user.username, client.user.avatarURL(), 'https://github.com/tcwork322/EHP-Grabber-Bot')
@@ -184,6 +217,10 @@ client.on('message', async message => {
 	// Clue Command
 	if (command === 'clues') {
 		const username = args.join(' ');
+		if (args.length < 1) {
+			message.delete();
+			return message.reply('are you mentally deficient?? I can\'t find nobody!');
+		}
 		console.log('Command Accepted');
 		(async () => {
 			try {
@@ -276,58 +313,128 @@ client.on('message', async message => {
 		];
 		message.channel.send(quotes[Math.floor(Math.random() * quotes.length)]);
 	}
-	// Login and out commands for mySQL
-	/* if (command === 'login') {
-		const username = args.join(' ');
-		const verifyStats = await hiscores.getStats(username).catch(err => message.reply(err + '.'));
-		const verifyUsername = Object.prototype.hasOwnProperty.call(verifyStats, 'main');
-		if(verifyUsername === true) {
-			con.query(`SELECT * FROM global where id = '${message.author.id}' AND server = '${message.guild.id}'`, (err, rows) => {
-				if(err) throw err;
+	// Total XP Commands
+	if (command === 'stats') {
+		// Coord note
+		// Title 101 x 13 
+		// Total 163 x 277
+		// first skill starts at 40
+		/*
+		78
+		111
+		144
+		177
+		210
+		243
+		276
+		309
+		*/
+		//
 
-				let sql;
-
-				if(rows.length < 1) {
-					sql = `INSERT INTO global (name, id, osrsname, server) VALUES ('${message.author.username}', '${message.author.id}', '${username}', '${message.guild.id}')`;
-					message.reply('Success! Logged in as ' + username + '!');
+		(async () => {
+			const username = args.join(' ');
+			let iconCord;
+			let textCord;
+			try {
+				const msg = await message.channel.send('Hold on one second...');
+				const stats = await hiscores.getStats(username);
+				msg.delete();
+				if(stats.main.skills.overall.xp < 1000000) {
+					iconCord = 140;
+					textCord = 156;
+				}
+				else if(stats.main.skills.overall.xp < 10000000) {
+					iconCord = 135;
+					textCord = 151;
+				}
+				else if(stats.main.skills.overall.xp < 100000000) {
+					iconCord = 130;
+					textCord = 146;
+				}
+				else if(stats.main.skills.overall.xp < 1000000000) {
+					iconCord = 125;
+					textCord = 141;
 				}
 				else {
-					message.reply('You are already logged in. If you want to logout, type ' + prefix + 'logout.');
-					return;
+					iconCord = 118;
+					textCord = 134;
 				}
-				con.query(sql, console.log);
-			});
-		}
-		else {
-			return;
-		}
-	}
+				// Canvas Init
+				const canvas = Canvas.createCanvas(202, 297);
+				const ctx = canvas.getContext('2d');
+				// Background Loading Canvas
+				const background = await Canvas.loadImage('./runescape_stats.png');
+				const overallPng = await Canvas.loadImage('./overall.png');
+				ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
+				ctx.font = '200 13px RunescapeUF';
+				ctx.fillStyle = '#FFFF00';
+				// First Column Skills
+				ctx.fillText(stats.main.skills.attack.level, 39, 45);
+				ctx.fillText(stats.main.skills.attack.level, 53, 57);
+				ctx.fillText(stats.main.skills.strength.level, 39, 77);
+				ctx.fillText(stats.main.skills.strength.level, 53, 90);
+				ctx.fillText(stats.main.skills.defence.level, 39, 109);
+				ctx.fillText(stats.main.skills.defence.level, 53, 122);
+				ctx.fillText(stats.main.skills.ranged.level, 39, 141);
+				ctx.fillText(stats.main.skills.ranged.level, 53, 154);
+				ctx.fillText(stats.main.skills.prayer.level, 39, 173);
+				ctx.fillText(stats.main.skills.prayer.level, 53, 186);
+				ctx.fillText(stats.main.skills.magic.level, 39, 205);
+				ctx.fillText(stats.main.skills.magic.level, 53, 218);
+				ctx.fillText(stats.main.skills.runecraft.level, 39, 237);
+				ctx.fillText(stats.main.skills.runecraft.level, 53, 250);
+				ctx.fillText(stats.main.skills.construction.level, 39, 269);
+				ctx.fillText(stats.main.skills.construction.level, 53, 282);
+				// Second Column Skills
+				ctx.fillText(stats.main.skills.hitpoints.level, 102, 45);
+				ctx.fillText(stats.main.skills.hitpoints.level, 116, 57);
+				ctx.fillText(stats.main.skills.agility.level, 102, 77);
+				ctx.fillText(stats.main.skills.agility.level, 116, 90);
+				ctx.fillText(stats.main.skills.herblore.level, 102, 109);
+				ctx.fillText(stats.main.skills.herblore.level, 116, 122);
+				ctx.fillText(stats.main.skills.thieving.level, 102, 141);
+				ctx.fillText(stats.main.skills.thieving.level, 116, 154);
+				ctx.fillText(stats.main.skills.crafting.level, 102, 173);
+				ctx.fillText(stats.main.skills.crafting.level, 116, 186);
+				ctx.fillText(stats.main.skills.fletching.level, 102, 205);
+				ctx.fillText(stats.main.skills.fletching.level, 116, 218);
+				ctx.fillText(stats.main.skills.slayer.level, 102, 237);
+				ctx.fillText(stats.main.skills.slayer.level, 116, 250);
+				ctx.fillText(stats.main.skills.hunter.level, 102, 269);
+				ctx.fillText(stats.main.skills.hunter.level, 116, 282);
+				// Third Column Skills
+				ctx.fillText(stats.main.skills.mining.level, 165, 45);
+				ctx.fillText(stats.main.skills.mining.level, 179, 57);
+				ctx.fillText(stats.main.skills.smithing.level, 165, 77);
+				ctx.fillText(stats.main.skills.smithing.level, 179, 90);
+				ctx.fillText(stats.main.skills.fishing.level, 165, 109);
+				ctx.fillText(stats.main.skills.fishing.level, 179, 122);
+				ctx.fillText(stats.main.skills.cooking.level, 165, 141);
+				ctx.fillText(stats.main.skills.cooking.level, 179, 154);
+				ctx.fillText(stats.main.skills.firemaking.level, 165, 173);
+				ctx.fillText(stats.main.skills.firemaking.level, 179, 186);
+				ctx.fillText(stats.main.skills.woodcutting.level, 165, 205);
+				ctx.fillText(stats.main.skills.woodcutting.level, 179, 218);
+				ctx.fillText(stats.main.skills.farming.level, 165, 237);
+				ctx.fillText(stats.main.skills.farming.level, 179, 250);
+				// Username and Total Level
+				ctx.fillText(username, 10, 19);
+				ctx.font = '200 11px RunescapeUF';
+				ctx.drawImage(overallPng, iconCord, 8);
+				ctx.fillText(stats.main.skills.overall.xp, textCord, 19);
+				ctx.fillText(stats.main.skills.overall.level, 153, 283);
+				console.log(stats.main.skills);
+				// Assign canvas to attachment
+				const attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'runescapestats.png');
+				message.channel.send('Here you go!', attachment);
 
-	if (command === 'logout') {
-		con.query(`SELECT * FROM global where id = '${message.author.id}' AND server = '${message.guild.id}'`, (err, rows) => {
-			if(err) throw err;
-
-			let sql;
-
-			if(rows.length < 1) {
-				message.reply('You are not logged in.');
-				return;
 			}
-			else {
-				sql = `DELETE FROM global WHERE id='${message.author.id}' AND server = '${message.guild.id}`;
-				message.reply('You have logged out.');
+			catch (err) {
+				console.log(err);
+				message.reply('sorry, I\'m too busy to help you right now.');
 			}
-			con.query(sql, console.log);
-		});
+		})();
 	}
-
-	if (command === 'debug') {
-		const guildIds = client.guilds.cache.filter(g => g.id == message.guild.id).map(g => g.members);
-		// console.log(guildNames);
-		// console.log(usernames);
-		// console.log(client.users.cache);
-		console.log(guildIds);
-	}*/
 });
 
 // Notes for future, when weekly challenge starts, get osrs hiscores for selected boss and add to db, every 4 hrs subtract database kc from new kc to get current score
