@@ -1,0 +1,32 @@
+{
+  "name": "ehpgrabber",
+  "version": "1.0.0",
+  "description": "Nice",
+  "main": "index.js",
+  "dependencies": {
+    "canvas": "^2.6.1",
+    "crystalmethlabs": "^1.1.0",
+    "discord.js": "^12.2.0",
+    "dotenv": "^8.2.0",
+    "eslint": "^7.0.0",
+    "fs": "0.0.1-security",
+    "gifencoder": "^2.0.1",
+    "mysql": "^2.18.1",
+    "osrs-json-hiscores": "^2.1.0",
+    "puppeteer": "^3.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tcwork322/EHP-Grabber-Bot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tcwork322/EHP-Grabber-Bot/issues"
+  },
+  "homepage": "https://github.com/tcwork322/EHP-Grabber-Bot#readme"
+}
